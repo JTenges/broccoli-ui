@@ -1,8 +1,9 @@
 import { useAppForm } from '@/components/form/app-form';
 import { Button } from '@/components/ui/button';
+import { submitDetails } from '@/service/enter-details';
 import { z } from 'zod'
 
-const RequestInviteSchema = z.object({
+const EnterDetailsSchema = z.object({
   fullName: z.string().min(3, "Must be at least 3 characters"),
   email: z.string().min(1, { message: "Email cannot be empty" }).email({ message: "Invalid email address" }),
   confirmEmail: z.string().min(1, { message: "Confirmation email cannot be empty" }).email({ message: "Invalid confirmation email address" }),
@@ -10,7 +11,7 @@ const RequestInviteSchema = z.object({
   message: "Emails do not match",
   path: ["confirmEmail"],
 });
-type RequestInviteSchemaType = z.infer<typeof RequestInviteSchema>
+type EnterDetailsSchemaType = z.infer<typeof EnterDetailsSchema>
 
 export function EnterDetailsForm({onCompleted}: {onCompleted: () => void}) {
   const form = useAppForm({
@@ -18,14 +19,19 @@ export function EnterDetailsForm({onCompleted}: {onCompleted: () => void}) {
       fullName: "",
       email: "",
       confirmEmail: ""
-    } as RequestInviteSchemaType,
-    onSubmit: async ({ value }) => {
-      // Do something with form data
-      console.log(value)
+    } as EnterDetailsSchemaType,
+    onSubmit: () => {
       onCompleted()
     },
     validators: {
-      onSubmit: RequestInviteSchema
+      onSubmit: EnterDetailsSchema,
+      onSubmitAsync: async ({value}) => {
+        const result = await submitDetails({
+          name: value.fullName,
+          email: value.email
+        })
+        return result.error?.message
+      }
     }
   })
   return (<form
@@ -34,7 +40,7 @@ export function EnterDetailsForm({onCompleted}: {onCompleted: () => void}) {
       e.stopPropagation()
       form.handleSubmit()
     }}
-    className='flex flex-col'>
+    className='flex flex-col gap-4'>
 
     <form.AppField
       name="fullName"
@@ -52,10 +58,18 @@ export function EnterDetailsForm({onCompleted}: {onCompleted: () => void}) {
       selector={(state) => [state.canSubmit, state.isSubmitting]}
       children={([canSubmit, isSubmitting]) => (
         <>
-          <Button type="submit" disabled={!canSubmit}>
+          <Button type="submit" disabled={!canSubmit} className='mt-8'>
             {isSubmitting ? '...' : 'Submit'}
           </Button>
         </>
+      )}
+    />
+     <form.Subscribe
+      selector={(state) => [state.errorMap]}
+      children={([errorMap]) => (
+        <div className='text-sm text-red-600'>
+          {typeof errorMap.onSubmit === 'string' ? errorMap.onSubmit : ""}
+        </div>
       )}
     />
   </form>)

@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { HeartIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/_publicLayout')({
   component: RouteComponent,
@@ -6,8 +7,10 @@ export const Route = createFileRoute('/_publicLayout')({
 
 function RouteComponent() {
   return <div className='h-full flex flex-col'>
-    <div>BROCCOLI & CO.</div>
+    <div className='ml-10 my-6'>BROCCOLI & CO.</div>
+    <hr/>
     <Outlet />
-    <div className='flex flex-col items-center'><span>Made with love from Sydney</span><span>copyright Broccoli & Co. All rights reserved.</span></div>
+    <hr/>
+    <div className='my-4 flex flex-col items-center text-xs'><span>Made with <HeartIcon className='inline' fill='black' size={14}/> from Sydney</span><span>copyright Broccoli & Co. All rights reserved.</span></div>
   </div>
 }

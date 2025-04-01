@@ -20,7 +20,8 @@ export function RequestInviteDialogTrigger() {
       </DialogTrigger>
       <DialogOverlay/>
       <DialogContent>
-        <DialogTitle>Request an invite</DialogTitle>
+        <DialogTitle className="mx-auto text-2xl font-semibold my-4">Request an invite</DialogTitle>
+        <hr className="mx-auto w-32"/>
         {stage === RequestInviteStage.ENTER_DETAILS && <EnterDetailsForm onCompleted={() => setStage(RequestInviteStage.COMPLETED)} />}
         {stage === RequestInviteStage.COMPLETED && <Completed onConfirm={() => setOpen(false)}/>}
       </DialogContent>
