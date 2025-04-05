@@ -37,7 +37,7 @@ export function RequestInviteDialogTrigger() {
         </Button>
       </DialogTrigger>
       <DialogOverlay />
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogTitle className="sr-only">Request an invite</DialogTitle>
         {stage === RequestInviteStage.ENTER_DETAILS && (
           <EnterDetailsForm

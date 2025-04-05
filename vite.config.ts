@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { defineConfig } from "vite";
 import viteReact from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
@@ -15,10 +17,14 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./vitest-setup.js"],
+    include: ["src/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
   },
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
     },
+  },
+  preview: {
+    port: 4173,
   },
 });

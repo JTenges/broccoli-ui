@@ -32,6 +32,14 @@ const server = setupServer(
       );
     }
 
+    if (requestBody && requestBody["email"] === "unexpected-json@error.com") {
+      return HttpResponse.json({}, { status: 500 });
+    }
+
+    if (requestBody && requestBody["email"] === "unexpected-string@error.com") {
+      return HttpResponse.text("Error", { status: 500 });
+    }
+
     return HttpResponse.text("Success");
   }),
 );
@@ -43,7 +51,9 @@ afterAll(() => server.close());
 describe("EnterDetailsForm", () => {
   test("validates form fields on client side", async () => {
     const onCompletedMock = vi.fn();
-    render(<EnterDetailsForm onCompleted={onCompletedMock} />, { wrapper: testWrapper });
+    render(<EnterDetailsForm onCompleted={onCompletedMock} />, {
+      wrapper: testWrapper,
+    });
 
     // Submit empty form - should trigger validation errors
     fireEvent.click(screen.getByText("Submit"));
@@ -86,7 +96,9 @@ describe("EnterDetailsForm", () => {
 
   test("submits valid data to API and calls onCompleted on success", async () => {
     const onCompletedMock = vi.fn();
-    render(<EnterDetailsForm onCompleted={onCompletedMock} />, { wrapper: testWrapper });
+    render(<EnterDetailsForm onCompleted={onCompletedMock} />, {
+      wrapper: testWrapper,
+    });
 
     // Fill form with valid data
     fireEvent.change(screen.getByLabelText(/Full name/i), {
@@ -107,9 +119,11 @@ describe("EnterDetailsForm", () => {
     }, {});
   });
 
-  test("displays API error message when submission fails", async () => {
+  test("displays API error message if api returns an expected error", async () => {
     const onCompletedMock = vi.fn();
-    render(<EnterDetailsForm onCompleted={onCompletedMock} />, { wrapper: testWrapper });
+    render(<EnterDetailsForm onCompleted={onCompletedMock} />, {
+      wrapper: testWrapper,
+    });
 
     // Fill form with data that will trigger API error
     fireEvent.change(screen.getByLabelText(/Full name/i), {
@@ -128,6 +142,64 @@ describe("EnterDetailsForm", () => {
     await waitFor(() => {
       expect(
         screen.getByText("This email is already registered"),
+      ).toBeInTheDocument();
+    });
+
+    expect(onCompletedMock).not.toHaveBeenCalled();
+  });
+
+  test("displays default error message when api returns an unexpected error json format", async () => {
+    const onCompletedMock = vi.fn();
+    render(<EnterDetailsForm onCompleted={onCompletedMock} />, {
+      wrapper: testWrapper,
+    });
+
+    // Fill form with data that will trigger API error
+    fireEvent.change(screen.getByLabelText(/Full name/i), {
+      target: { value: "Jane Doe" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Email$/i), {
+      target: { value: "unexpected-json@error.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Email/i), {
+      target: { value: "unexpected-json@error.com" },
+    });
+
+    fireEvent.click(screen.getByText("Submit"));
+
+    // Check that error message is displayed
+    await waitFor(() => {
+      expect(
+        screen.getByText("An unexpected error occurred please try again later"),
+      ).toBeInTheDocument();
+    });
+
+    expect(onCompletedMock).not.toHaveBeenCalled();
+  });
+
+  test("displays default error message when api returns an unexpected error format", async () => {
+    const onCompletedMock = vi.fn();
+    render(<EnterDetailsForm onCompleted={onCompletedMock} />, {
+      wrapper: testWrapper,
+    });
+
+    // Fill form with data that will trigger API error
+    fireEvent.change(screen.getByLabelText(/Full name/i), {
+      target: { value: "Jane Doe" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Email$/i), {
+      target: { value: "unexpected-string@error.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Email/i), {
+      target: { value: "unexpected-string@error.com" },
+    });
+
+    fireEvent.click(screen.getByText("Submit"));
+
+    // Check that error message is displayed
+    await waitFor(() => {
+      expect(
+        screen.getByText("An unexpected error occurred please try again later"),
       ).toBeInTheDocument();
     });
 

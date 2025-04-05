@@ -5,7 +5,7 @@ import { describe, expect, test } from "vitest";
 
 describe("Request Invite Dialog Trigger", () => {
   test("opens dialog when clicked", async () => {
-    render(<RequestInviteDialogTrigger />, {wrapper: testWrapper});
+    render(<RequestInviteDialogTrigger />, { wrapper: testWrapper });
 
     fireEvent.click(screen.getByText("Request an invite"));
 

@@ -10,6 +10,12 @@ Run in development mode:
 Run tests (vitest):
 `npm run test`
 
+Install e2e test dependencies:
+`npx playwright install-deps`
+
+Run e2e tests:
+`npm run test:e2e`
+
 Run linting:
 `npm run lint`
 
@@ -31,6 +37,8 @@ Preview production build:
   - service: api calls
 
 ## Browser support
+
+e2e tests are used to validate that the app works on desktop and mobile browsers.
 
 ### JS
 
